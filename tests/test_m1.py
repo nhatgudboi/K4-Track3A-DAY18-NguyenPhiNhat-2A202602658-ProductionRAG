@@ -2,7 +2,8 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.m1_chunking import (chunk_basic, chunk_semantic, chunk_hierarchical,
-                              chunk_structure_aware, compare_strategies, load_documents, Chunk)
+                              chunk_structure_aware, compare_strategies, load_documents, Chunk,
+                              parse_policy_header, mark_superseded_policies)
 
 TEXT = """# Nghỉ phép
 
@@ -96,3 +97,79 @@ def test_compare_all_strategies():
         r = compare_strategies(docs)
         for key in ["basic", "semantic", "hierarchical", "structure"]:
             assert key in r, f"Missing strategy: {key}"
+
+
+# --- Version-aware policy handling ---
+
+V2023 = """# Chính sách nghỉ phép năm (Phiên bản 2023)
+> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2023 | Phòng ban: Nhân sự
+
+## Số ngày phép năm
+Mỗi nhân viên chính thức được hưởng **12 ngày phép năm** có lương."""
+
+V2024 = """# Chính sách nghỉ phép năm (Phiên bản 2024)
+> Phiên bản: 2.0 | Ngày hiệu lực: 01/01/2024 | Phòng ban: Nhân sự
+
+## Số ngày phép năm
+Mỗi nhân viên chính thức được hưởng **15 ngày phép năm** có lương."""
+
+
+def test_parse_policy_header():
+    meta = parse_policy_header(V2024)
+    assert meta["policy_version"] == "2.0"
+    assert meta["effective_date"] == "2024-01-01"
+    # Nhãn "(Phiên bản 2024)" phải được bỏ để gom về cùng họ chính sách.
+    assert meta["policy_family"] == "chính sách nghỉ phép năm"
+
+
+def test_parse_policy_header_handles_missing():
+    """Tài liệu không có header không phải lỗi — trả về None, không raise."""
+    meta = parse_policy_header("Một đoạn văn bất kỳ không có header.")
+    assert meta["policy_version"] is None
+    assert meta["effective_date"] is None
+    assert meta["policy_family"] is None
+
+
+def test_parse_policy_header_detects_superseded():
+    old = """# Chính sách mật khẩu (Phiên bản cũ)
+> Phiên bản: 1.0 | Ngày hiệu lực: 01/01/2022 | Trạng thái: ĐÃ THAY THẾ bởi v2.0
+"""
+    assert parse_policy_header(old)["superseded_by"] == "2.0"
+
+
+def test_superseded_detected_by_effective_date():
+    """Bản cũ hơn trong cùng họ bị gắn cờ dù KHÔNG tự khai đã thay thế."""
+    docs = [
+        {"text": V2023, "metadata": {**parse_policy_header(V2023), "source": "old.md"}},
+        {"text": V2024, "metadata": {**parse_policy_header(V2024), "source": "new.md"}},
+    ]
+    mark_superseded_policies(docs)
+    assert docs[0]["metadata"]["is_superseded"] is True
+    assert docs[0]["metadata"]["current_source"] == "new.md"
+    assert docs[1]["metadata"]["is_superseded"] is False
+
+
+def test_single_version_not_marked_superseded():
+    """Chỉ có một bản thì không đối chiếu được → không suy diễn là bản cũ."""
+    docs = [{"text": V2024, "metadata": {**parse_policy_header(V2024), "source": "only.md"}}]
+    mark_superseded_policies(docs)
+    assert docs[0]["metadata"].get("is_superseded") is False
+
+
+def test_load_documents_flags_real_superseded():
+    """Kho dữ liệu thật phải có đúng 2 bản bị thay thế."""
+    docs = load_documents()
+    by_source = {d["metadata"]["source"]: d["metadata"] for d in docs}
+    assert by_source["nghi_phep_nam_v2023.md"]["is_superseded"] is True
+    assert by_source["mat_khau_v1.md"]["is_superseded"] is True
+    # Bản hiện hành KHÔNG được gắn cờ.
+    assert by_source["nghi_phep_nam_v2024.md"]["is_superseded"] is False
+    assert by_source["mat_khau_v2.md"]["is_superseded"] is False
+    # Tài liệu không thuộc họ nào (chỉ có một bản) vẫn phải an toàn.
+    assert by_source["tam_ung.md"]["is_superseded"] is False
+
+
+def test_load_documents_can_drop_superseded():
+    kept = load_documents(drop_superseded=True)
+    assert len(kept) < len(load_documents())
+    assert not any(d["metadata"].get("is_superseded") for d in kept)

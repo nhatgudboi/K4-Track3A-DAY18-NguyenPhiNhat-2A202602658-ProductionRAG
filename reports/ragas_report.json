@@ -1,171 +1,171 @@
 {
   "aggregate": {
-    "faithfulness": 0.2875,
-    "answer_relevancy": 0.2780250718699583,
-    "context_precision": 0.3833333333099999,
-    "context_recall": 0.4333333333333333
+    "faithfulness": 0.9,
+    "answer_relevancy": 0.8318991929866503,
+    "context_precision": 0.9916666666287501,
+    "context_recall": 0.8583333333333332
   },
   "num_questions": 20,
   "failures": [
     {
-      "question": "Phụ cấp ăn trưa hàng tháng là bao nhiêu?",
-      "answer": "Không tìm thấy.",
-      "ground_truth": "Phụ cấp ăn trưa là 1.000.000 VNĐ/tháng, chi trả cùng kỳ lương.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.0,
-      "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.0,
-        "context_recall": 0.0
-      },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
-    },
-    {
       "question": "Nhân viên tạm ứng 15 triệu, sau 20 ngày mới thanh toán. Bị phạt bao nhiêu?",
-      "answer": "Không tìm thấy.",
+      "answer": "Để tính phí phạt cho khoản tạm ứng 15 triệu VNĐ sau 20 ngày chưa thanh toán, ta thực hiện các bước sau:\n\n1. **Xác định số ngày quá hạn**: \n   - Thời hạn thanh toán là 15 ngày.\n   - Nhân viên thanh toán sau 20 ngày, tức là quá hạn 5 ngày.\n\n2. **Tính phí phạt**:\n   - Phí phạt là 2%/tháng trên số tiền chưa hoàn ứng.\n   - Số tiền chưa hoàn ứng là 15.000.000 VNĐ.\n   - Tính phí phạt cho 5 ngày: \n     - Đầu tiên, quy đổi 5 ngày thành tháng: \\( \\frac{5}{30} = \\frac{1}{6} \\) tháng.\n     - Tính phí phạt: \n       \\[\n       \\text{Phí phạt} = 15.000.000 \\times 2\\% \\times \\frac{1}{6} = 15.000.000 \\times 0.02 \\times \\frac{1}{6} = 50.000 VNĐ.\n       \\]\n\nVậy, nhân viên sẽ bị phạt **50.000 VNĐ**.",
       "ground_truth": "Thời hạn thanh toán là 15 ngày. Quá hạn 5 ngày, bị tính phí 2%/tháng trên 15.000.000 VNĐ = 300.000 VNĐ/tháng (tính pro-rata khoảng 50.000 VNĐ cho 5 ngày).",
       "worst_metric": "faithfulness",
       "worst_score": 0.0,
-      "avg_score": 0.0,
+      "avg_score": 0.6272344295844473,
       "scores": {
         "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.0,
-        "context_recall": 0.0
+        "answer_relevancy": 0.842271051704456,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 0.6666666666666666
       },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+      "diagnosis": "Hệ thống không tìm được ngữ cảnh để trả lời (LLM từ chối / không có context) — đây là lỗi ở tầng Retrieval, không phải hallucination.",
+      "suggested_fix": "Kiểm tra lại chunking + parent_id của từng tài liệu, đảm bảo BM25 bắt được từ khóa chính xác và parent expansion trả đúng đoạn cha."
     },
     {
-      "question": "Bảo hiểm sức khỏe PVI có hạn mức bao nhiêu cho nhân viên?",
-      "answer": "Không tìm thấy.",
-      "ground_truth": "Hạn mức bảo hiểm sức khỏe PVI cho nhân viên là 200.000.000 VNĐ/năm, bao gồm nội trú, ngoại trú và nha khoa.",
+      "question": "Một nhân viên Senior có 9 năm thâm niên được nghỉ bao nhiêu ngày phép năm và lương trong khoảng nào?",
+      "answer": "Nhân viên có 9 năm thâm niên sẽ được hưởng **18 ngày phép năm** (15 + 3). \n\nVề lương, không có thông tin cụ thể trong context để xác định lương của nhân viên Senior. \n\nTóm lại, nhân viên này được nghỉ **18 ngày phép năm**.",
+      "ground_truth": "Theo chính sách v2024: 15 ngày cơ bản + 3 ngày thâm niên (9÷3=3) = 18 ngày phép. Lương Senior (P3-P4): 20-35 triệu VNĐ/tháng.",
       "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.083333333325,
+      "worst_score": 0.5,
+      "avg_score": 0.6976034754103506,
       "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.3333333333,
-        "context_recall": 0.0
-      },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
-    },
-    {
-      "question": "Nghỉ phép không lương 20 ngày cần ai phê duyệt?",
-      "answer": "Không tìm thấy.",
-      "ground_truth": "Nghỉ 16-30 ngày cần phê duyệt của Giám đốc điều hành (CEO). Lưu ý: nghỉ trên 14 ngày không lương, nhân viên phải tự đóng phần bảo hiểm của mình.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.083333333325,
-      "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.3333333333,
-        "context_recall": 0.0
-      },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
-    },
-    {
-      "question": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng hoàn thành khóa học. Phải hoàn trả bao nhiêu?",
-      "answer": "Nhân viên đã được tài trợ khóa học 25 triệu, nhưng theo chính sách, công ty chỉ chi trả tối đa 30.000.000 VNĐ cho khóa học. Nhân viên này nghỉ việc sau 8 tháng, trong khi thâm niên yêu cầu để được tài trợ là từ 1 năm trở lên. Do đó, nhân viên này không đủ điều kiện để giữ khoản tài trợ và phải hoàn trả toàn bộ số tiền đã nhận.\n\nVậy, nhân viên phải hoàn trả **25 triệu VNĐ**.",
-      "ground_truth": "Nhân viên phải cam kết làm việc ít nhất 1 năm sau khi hoàn thành khóa học. Nghỉ sau 8 tháng là trước hạn cam kết, phải hoàn trả 100% chi phí tức 25.000.000 VNĐ.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.11740321941691167,
-      "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.4696128776676467,
-        "context_precision": 0.0,
-        "context_recall": 0.0
-      },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
-    },
-    {
-      "question": "Có cần kích hoạt xác thực đa yếu tố (MFA) không?",
-      "answer": "Có, cần kích hoạt xác thực đa yếu tố (MFA). Phương thức MFA được chấp nhận bao gồm \"ứng dụng Authenticator (ưu tiên), SMS OTP, hoặc YubiKey.\"",
-      "ground_truth": "Có, theo chính sách mật khẩu v2.0 hiện hành, tất cả nhân viên bắt buộc kích hoạt MFA cho email, VPN và hệ thống nội bộ. Chính sách cũ v1.0 không yêu cầu MFA.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.1249999999875,
-      "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.49999999995,
-        "context_recall": 0.0
-      },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
-    },
-    {
-      "question": "Mật khẩu phải có tối thiểu bao nhiêu ký tự?",
-      "answer": "Mật khẩu phải có tối thiểu **8 ký tự**.",
-      "ground_truth": "Theo chính sách hiện hành (v2.0), mật khẩu phải có tối thiểu 12 ký tự. Chính sách cũ (v1.0) yêu cầu 8 ký tự nhưng đã bị thay thế.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.125,
-      "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.0,
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.7904139016914026,
+        "context_precision": 0.99999999995,
         "context_recall": 0.5
       },
       "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
       "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
     },
     {
-      "question": "Nhân viên thử việc có được nghỉ phép năm không?",
-      "answer": "Không tìm thấy.",
-      "ground_truth": "KHÔNG. Nhân viên thử việc KHÔNG được nghỉ phép năm. Nếu cần nghỉ, phải xin nghỉ không lương và được trưởng phòng phê duyệt.",
-      "worst_metric": "faithfulness",
+      "question": "Thông tin lương thuộc cấp độ phân loại dữ liệu nào?",
+      "answer": "Thông tin lương thuộc cấp độ phân loại dữ liệu **Bí mật**. Cụ thể, \"Thông tin lương là dữ liệu **Bí mật**, cấm chia sẻ với đồng nghiệp.\"",
+      "ground_truth": "Theo quy chế chi trả lương, thông tin lương được phân loại là dữ liệu Bí mật, cấm chia sẻ với đồng nghiệp. Theo chính sách phân loại dữ liệu, dữ liệu Bí mật (cấp 3) phải mã hóa khi truyền và hạn chế truy cập theo need-to-know.",
+      "worst_metric": "answer_relevancy",
       "worst_score": 0.0,
-      "avg_score": 0.14583333332604165,
+      "avg_score": 0.7499999999916667,
       "scores": {
-        "faithfulness": 0.0,
+        "faithfulness": 1.0,
         "answer_relevancy": 0.0,
-        "context_precision": 0.5833333333041666,
-        "context_recall": 0.0
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Hệ thống không tìm được ngữ cảnh để trả lời (LLM từ chối / không có context) — đây là lỗi ở tầng Retrieval, không phải hallucination.",
+      "suggested_fix": "Kiểm tra lại chunking + parent_id của từng tài liệu, đảm bảo BM25 bắt được từ khóa chính xác và parent expansion trả đúng đoạn cha."
+    },
+    {
+      "question": "Thâm niên bao nhiêu năm thì được cộng thêm ngày phép?",
+      "answer": "Nhân viên có thâm niên từ **3 năm trở lên** được cộng thêm **1 ngày phép** cho mỗi 3 năm làm việc liên tục.",
+      "ground_truth": "Theo chính sách v2024 hiện hành, nhân viên có thâm niên từ 3 năm trở lên được cộng thêm 1 ngày phép cho mỗi 3 năm. Chính sách cũ v2023 yêu cầu 5 năm.",
+      "worst_metric": "context_recall",
+      "worst_score": 0.5,
+      "avg_score": 0.7909989798437734,
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.6639959194084271,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 0.5
+      },
+      "diagnosis": "Hệ thống tìm kiếm bỏ sót đoạn văn chứa đáp án đúng.",
+      "suggested_fix": "Cải thiện chunking (hierarchical/structure-aware) hoặc bổ sung BM25 để bắt từ khóa chính xác."
+    },
+    {
+      "question": "Có cần kích hoạt xác thực đa yếu tố (MFA) không?",
+      "answer": "Có, tất cả nhân viên **bắt buộc** kích hoạt MFA cho tài khoản email, VPN và các hệ thống nội bộ.",
+      "ground_truth": "Có, theo chính sách mật khẩu v2.0 hiện hành, tất cả nhân viên bắt buộc kích hoạt MFA cho email, VPN và hệ thống nội bộ. Chính sách cũ v1.0 không yêu cầu MFA.",
+      "worst_metric": "context_recall",
+      "worst_score": 0.5,
+      "avg_score": 0.8037527280561504,
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.715010912257935,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 0.5
+      },
+      "diagnosis": "Hệ thống tìm kiếm bỏ sót đoạn văn chứa đáp án đúng.",
+      "suggested_fix": "Cải thiện chunking (hierarchical/structure-aware) hoặc bổ sung BM25 để bắt từ khóa chính xác."
+    },
+    {
+      "question": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng hoàn thành khóa học. Phải hoàn trả bao nhiêu?",
+      "answer": "Nhân viên phải hoàn trả **100% chi phí** đào tạo đã được tài trợ. \n\nVì vậy, số tiền phải hoàn trả là: **25.000.000 VNĐ**.",
+      "ground_truth": "Nhân viên phải cam kết làm việc ít nhất 1 năm sau khi hoàn thành khóa học. Nghỉ sau 8 tháng là trước hạn cam kết, phải hoàn trả 100% chi phí tức 25.000.000 VNĐ.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.5,
+      "avg_score": 0.8071349211281894,
+      "scores": {
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.7285396845460911,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
       },
       "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
       "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
     },
     {
       "question": "Bao lâu phải đổi mật khẩu một lần?",
-      "answer": "Mật khẩu phải được thay đổi **mỗi 90 ngày**.",
+      "answer": "Mật khẩu phải được thay đổi **mỗi 120 ngày**.",
       "ground_truth": "Theo chính sách hiện hành (v2.0), mật khẩu phải được thay đổi mỗi 120 ngày. Chính sách cũ yêu cầu 90 ngày nhưng đã bị thay thế.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.20833333332499998,
+      "worst_metric": "context_recall",
+      "worst_score": 0.5,
+      "avg_score": 0.8402290695433817,
       "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.3333333333,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8609162782068603,
+        "context_precision": 0.9999999999666667,
         "context_recall": 0.5
       },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+      "diagnosis": "Hệ thống tìm kiếm bỏ sót đoạn văn chứa đáp án đúng.",
+      "suggested_fix": "Cải thiện chunking (hierarchical/structure-aware) hoặc bổ sung BM25 để bắt từ khóa chính xác."
     },
     {
-      "question": "Mentor và buddy của nhân viên mới có thể là cùng một người không? Quản lý trực tiếp có thể làm mentor không?",
-      "answer": "Không tìm thấy.",
-      "ground_truth": "KHÔNG cho cả hai. Mentor và buddy phải là hai người khác nhau. Quản lý trực tiếp không được làm mentor hoặc buddy.",
-      "worst_metric": "faithfulness",
-      "worst_score": 0.0,
-      "avg_score": 0.25,
+      "question": "Mật khẩu phải có tối thiểu bao nhiêu ký tự?",
+      "answer": "Mật khẩu phải có tối thiểu **12 ký tự**.",
+      "ground_truth": "Theo chính sách hiện hành (v2.0), mật khẩu phải có tối thiểu 12 ký tự. Chính sách cũ (v1.0) yêu cầu 8 ký tự nhưng đã bị thay thế.",
+      "worst_metric": "context_recall",
+      "worst_score": 0.5,
+      "avg_score": 0.8667963908079231,
       "scores": {
-        "faithfulness": 0.0,
-        "answer_relevancy": 0.0,
-        "context_precision": 0.0,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.9671855632816927,
+        "context_precision": 0.99999999995,
+        "context_recall": 0.5
+      },
+      "diagnosis": "Hệ thống tìm kiếm bỏ sót đoạn văn chứa đáp án đúng.",
+      "suggested_fix": "Cải thiện chunking (hierarchical/structure-aware) hoặc bổ sung BM25 để bắt từ khóa chính xác."
+    },
+    {
+      "question": "Muốn mua thiết bị trị giá 55 triệu cần ai phê duyệt?",
+      "answer": "Đối với đơn hàng trị giá 55 triệu VNĐ, cần có phê duyệt của Tổng Giám đốc (CEO) vì \"Trên **50.000.000 VNĐ** | Tổng Giám đốc (CEO)\".",
+      "ground_truth": "Đơn hàng trên 50.000.000 VNĐ cần Tổng Giám đốc (CEO) phê duyệt.",
+      "worst_metric": "context_precision",
+      "worst_score": 0.8333333332916666,
+      "avg_score": 0.9179790467238813,
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.838582853603859,
+        "context_precision": 0.8333333332916666,
         "context_recall": 1.0
       },
-      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
-      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+      "diagnosis": "Đoạn văn không liên quan bị xếp lên đầu, gây nhiễu LLM.",
+      "suggested_fix": "Bổ sung Cross-Encoder reranking hoặc lọc theo metadata (source/section)."
+    },
+    {
+      "question": "Nếu cần mua một chiếc laptop 30 triệu cho nhân viên mới, ai phê duyệt và cần gì từ phòng CNTT?",
+      "answer": "Đối với đơn hàng mua một chiếc laptop 30 triệu VNĐ, người phê duyệt sẽ là Giám đốc phòng ban (Director) vì giá trị đơn hàng nằm trong khoảng từ 5.000.000 VNĐ đến 50.000.000 VNĐ.\n\nNgoài ra, cần có xác nhận của phòng CNTT về cấu hình kỹ thuật trước khi đề xuất.",
+      "ground_truth": "Laptop 30 triệu nằm trong khoảng 5-50 triệu nên cần Giám đốc phòng ban (Director) phê duyệt. Ngoài ra, mua sắm thiết bị CNTT cần có xác nhận cấu hình kỹ thuật từ phòng CNTT trước khi đề xuất. Cần đính kèm ít nhất 3 báo giá vì trên 10 triệu.",
+      "worst_metric": "answer_relevancy",
+      "worst_score": 0.7946388836913906,
+      "avg_score": 0.9486597209145143,
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7946388836913906,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
+      },
+      "diagnosis": "Câu trả lời lệch trọng tâm, quá ngắn, HOẶC bị judge đánh dấu noncommittal (điểm 0.0 = câu trả lời né tránh).",
+      "suggested_fix": "Nếu điểm ~0.0: kiểm tra retrieval đã lấy đúng đoạn chứa đáp án chưa — đây là lỗi thật. Nếu điểm 0.4-0.6 với câu trả lời đúng: đây là đặc tính của metric, đối chiếu ground_truth trước khi sửa prompt sinh câu trả lời."
     }
   ]
 }

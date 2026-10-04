@@ -32,6 +32,11 @@ SEMANTIC_THRESHOLD = 0.85
 BM25_TOP_K = 20
 DENSE_TOP_K = 20
 HYBRID_TOP_K = 20
+# Hằng số làm mượt của RRF. Công thức: RRF_Score(d) = Σ 1 / (RRF_K + rank + 1)
+RRF_K = 60
+# Số token tối đa đưa vào Cross-Encoder. Chunk 2048 ký tự tiếng Việt cần nhiều
+# token hơn tiếng Anh — 256 làm mất đáp án nằm cuối đoạn (giảm context_recall).
+RERANK_MAX_LENGTH = 512
 RERANK_TOP_K = 3
 
 # --- Paths ---

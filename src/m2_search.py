@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (QDRANT_HOST, QDRANT_PORT, COLLECTION_NAME, EMBEDDING_MODEL,
-                    EMBEDDING_DIM, BM25_TOP_K, DENSE_TOP_K, HYBRID_TOP_K)
+                    EMBEDDING_DIM, BM25_TOP_K, DENSE_TOP_K, HYBRID_TOP_K, RRF_K)
 
 
 @dataclass
@@ -20,6 +20,7 @@ class SearchResult:
     score: float
     metadata: dict
     method: str  # "bm25", "dense", "hybrid"
+    chunk_id: str | None = None  # định danh ổn định để RRF dedup không nhầm chunk trùng text
 
 
 def segment_vietnamese(text: str) -> str:
@@ -51,7 +52,9 @@ class BM25Search:
             tokens = seg.split() if seg else []
             self.corpus_tokens.append(tokens)
         from rank_bm25 import BM25Okapi
-        if any(self.corpus_tokens):
+        # `any(self.corpus_tokens)` sai: any() trên list-of-list chỉ False khi MỌI
+        # phần tử rỗng → corpus toàn rỗng vẫn khởi tạo BM25Okapi rồi crash.
+        if self.corpus_tokens and any(tokens for tokens in self.corpus_tokens):
             self.bm25 = BM25Okapi(self.corpus_tokens)
 
     def search(self, query: str, top_k: int = BM25_TOP_K) -> list[SearchResult]:
@@ -79,6 +82,7 @@ class BM25Search:
                 score=float(scores[idx]),
                 metadata=doc.get("metadata", {}),
                 method="bm25",
+                chunk_id=str(doc.get("chunk_id", idx)),
             ))
         return results
 
@@ -86,12 +90,19 @@ class BM25Search:
 class DenseSearch:
     def __init__(self):
         from qdrant_client import QdrantClient
+        self.using_fallback = False
         try:
             self.client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT, timeout=5)
             self.client.get_collections()
-        except Exception:
-            # Fallback in-memory nếu Qdrant không khả dụng (để test vẫn chạy).
+        except Exception as e:
+            # Fallback in-memory để test vẫn chạy được khi thiếu Docker.
+            # Phải CẢNH BÁO rõ — im lặng fallback khiến người dùng tưởng đang
+            # chạy với Qdrant thật và tưởng điểm số không đáng tin.
             self.client = QdrantClient(":memory:")
+            self.using_fallback = True
+            print(f"  ⚠️  Không kết nối được Qdrant server ({QDRANT_HOST}:{QDRANT_PORT}): {e}")
+            print("  ⚠️  Đang dùng Qdrant in-memory fallback. Hãy chạy 'docker compose up -d' "
+                  "để tái tạo đúng môi trường Production.")
         self._encoder = None
 
     def _get_encoder(self):
@@ -140,8 +151,11 @@ class DenseSearch:
                 with_payload=True,
             )
         except TypeError:
-            # Tương thích phiên bản cũ.
-            response = self.client.query_points(collection, query=query_vector, limit=top_k)
+            # Tương thích phiên bản cũ — phải giữ with_payload=True, nếu không
+            # payload=None → text rỗng → dense search trả về rác.
+            response = self.client.query_points(
+                collection, query=query_vector, limit=top_k, with_payload=True
+            )
         results: list[SearchResult] = []
         for pt in response.points:
             payload = pt.payload or {}
@@ -150,17 +164,24 @@ class DenseSearch:
                 score=float(pt.score) if pt.score is not None else 0.0,
                 metadata={k: v for k, v in payload.items() if k != "text"},
                 method="dense",
+                chunk_id=str(pt.id) if pt.id is not None else None,
             ))
         return results
 
 
-def reciprocal_rank_fusion(results_list: list[list[SearchResult]], k: int = 60,
+def reciprocal_rank_fusion(results_list: list[list[SearchResult]], k: int = RRF_K,
                            top_k: int = HYBRID_TOP_K) -> list[SearchResult]:
-    """Merge ranked lists using RRF: score(d) = Σ 1/(k + rank + 1)."""
+    """
+    Merge ranked lists using RRF: score(d) = Σ 1/(k + rank + 1).
+
+    Dedup theo `chunk_id` (định danh ổn định) thay vì theo `text`: nếu khóa theo
+    text, hai chunk trùng nội dung sẽ bị gộp làm một và chỉ giữ metadata của
+    chunk đầu tiên — cùng dạng lỗi "parent-child collision" ở M1.
+    """
     rrf_scores: dict[str, dict] = {}
     for result_list in results_list:
         for rank, result in enumerate(result_list):
-            key = result.text
+            key = result.chunk_id or f"text::{result.text}"
             if key not in rrf_scores:
                 # Lưu reference đến SearchResult đầu tiên (giữ metadata gốc).
                 rrf_scores[key] = {"score": 0.0, "result": result}
@@ -173,6 +194,7 @@ def reciprocal_rank_fusion(results_list: list[list[SearchResult]], k: int = 60,
             score=float(item["score"]),
             metadata=item["result"].metadata,
             method="hybrid",
+            chunk_id=item["result"].chunk_id,
         )
         for item in sorted_items
     ]
@@ -183,6 +205,8 @@ class HybridSearch:
     def __init__(self):
         self.bm25 = BM25Search()
         self.dense = DenseSearch()
+        # True nếu đang dùng Qdrant thật (không phải fallback in-memory).
+        self.using_qdrant_server = getattr(self.dense.client, "_client", None) is not None
 
     def index(self, chunks: list[dict]) -> None:
         self.bm25.index(chunks)

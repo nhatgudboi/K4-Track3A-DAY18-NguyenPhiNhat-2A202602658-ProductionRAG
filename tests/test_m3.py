@@ -30,3 +30,54 @@ def test_rerank_relevant_first():
 def test_benchmark_stats():
     stats = benchmark_reranker(CrossEncoderReranker(), Q, DOCS, n_runs=2)
     assert "avg_ms" in stats and "min_ms" in stats and "max_ms" in stats
+
+
+# --- Sắp xếp lại ứng viên theo phiên bản chính sách ---
+
+def test_demote_moves_superseded_to_end():
+    from src.pipeline import _demote_superseded_candidates
+    from src.m3_rerank import RerankResult
+
+    ranked = [
+        RerankResult("v2023: 12 ngày", 0.9, 9.0, {"is_superseded": True}, 0),
+        RerankResult("v2024: 15 ngày", 0.9, 9.1, {"is_superseded": False}, 1),
+        RerankResult("v2023: thêm 1 ngày", 0.8, 8.0, {"is_superseded": True}, 2),
+    ]
+    out = _demote_superseded_candidates(ranked, [])
+    assert out[0].text == "v2024: 15 ngày", "Bản hiện hành phải lên đầu"
+    # Thứ tự giữa các bản cũ được giữ nguyên (ổn định).
+    assert [r.text for r in out[1:]] == ["v2023: 12 ngày", "v2023: thêm 1 ngày"]
+
+
+def test_demote_keeps_all_items():
+    """Không được mất chunk nào — bản cũ vẫn cần cho câu hỏi về lịch sử."""
+    from src.pipeline import _demote_superseded_candidates
+    from src.m3_rerank import RerankResult
+
+    ranked = [RerankResult(f"d{i}", 0.5, 1.0, {"is_superseded": i % 2 == 0}, i)
+              for i in range(6)]
+    out = _demote_superseded_candidates(ranked, [])
+    assert len(out) == 6
+    assert sorted(r.text for r in out) == sorted(r.text for r in ranked)
+
+
+def test_demote_handles_empty():
+    from src.pipeline import _demote_superseded_candidates
+    assert _demote_superseded_candidates([], []) == []
+
+
+def test_demote_without_metadata_key():
+    """Chunk không có khoá is_superseded phải được coi là bản hiện hành."""
+    from src.pipeline import _demote_superseded_candidates
+    from src.m3_rerank import RerankResult
+
+    ranked = [RerankResult("a", 0.5, 1.0, {}, 0), RerankResult("b", 0.4, 1.0, {}, 1)]
+    out = _demote_superseded_candidates(ranked, [])
+    assert [r.text for r in out] == ["a", "b"]
+
+
+def test_rerank_pool_larger_than_top_k():
+    """Pool rerank phải rộng hơn RERANK_TOP_K, nếu không việc hạ bản cũ vô nghĩa."""
+    from src.pipeline import RERANK_POOL_SIZE
+    from config import RERANK_TOP_K
+    assert RERANK_POOL_SIZE > RERANK_TOP_K

@@ -10,7 +10,7 @@ if hasattr(sys.stderr, "reconfigure"):
 from dataclasses import dataclass
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import RERANK_TOP_K
+from config import RERANK_TOP_K, RERANK_MAX_LENGTH
 
 
 @dataclass
@@ -47,7 +47,9 @@ class CrossEncoderReranker:
             return []
         model = self._load_model()
         pairs = [(query, doc["text"]) for doc in documents]
-        scores = model.predict(pairs, max_length=256, show_progress_bar=False)
+        # max_length=512 (không phải 256): chunk 2048 ký tự tiếng Việt ~ 700-900 token,
+        # cắt 256 làm mất đáp án nằm cuối đoạn → giảm context_recall đáng kể.
+        scores = model.predict(pairs, max_length=RERANK_MAX_LENGTH, show_progress_bar=False)
         # predict() có thể trả về scalar khi chỉ 1 sample.
         if isinstance(scores, (int, float)):
             scores = [scores]
@@ -69,16 +71,22 @@ class CrossEncoderReranker:
 
 
 class FlashrankReranker:
-    """Lightweight alternative (<5ms). Optional — dùng flashrank ONNX."""
+    """Lightweight ONNX alternative (<5ms) — chưa implement trong lab này.
+
+    Raise NotImplementedError thay vì trả về [] : trả [] khiến caller tưởng
+    rerank thành công rồi fallback nhầm sang kết quả hybrid chưa rerank.
+    """
     def __init__(self):
         self._model = None
 
     def rerank(self, query: str, documents: list[dict], top_k: int = RERANK_TOP_K) -> list[RerankResult]:
-        # Optional implementation: from flashrank import Ranker, RerankRequest
+        # Tham khảo implement sau:
+        # from flashrank import Ranker, RerankRequest
         # model = Ranker(); passages = [{"text": d["text"]} for d in documents]
         # results = model.rerank(RerankRequest(query=query, passages=passages))
-        # Lab không yêu cầu Flashrank; CrossEncoder đã đủ dùng.
-        return []
+        raise NotImplementedError(
+            "FlashrankReranker chưa được implement trong lab này — dùng CrossEncoderReranker."
+        )
 
 
 def benchmark_reranker(reranker, query: str, documents: list[dict], n_runs: int = 5) -> dict:

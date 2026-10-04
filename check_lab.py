@@ -60,9 +60,11 @@ def run_tests() -> tuple[int, int]:
     """Run pytest and return (passed, total)."""
     try:
         import re
+        # Timeout 600s: full suite nạp MiniLM + bge-m3 + bge-reranker-v2-m3 trên
+        # CPU mất ~110-250s tùy máy. Timeout cũ (120s) khiến check báo fail oan.
         result = subprocess.run(
             [sys.executable, "-m", "pytest", "tests/", "-v", "--tb=no", "-q"],
-            capture_output=True, text=True, timeout=120, encoding="utf-8", errors="replace"
+            capture_output=True, text=True, timeout=600, encoding="utf-8", errors="replace"
         )
         lines = result.stdout.strip().split("\n")
         summary = lines[-1] if lines else ""
