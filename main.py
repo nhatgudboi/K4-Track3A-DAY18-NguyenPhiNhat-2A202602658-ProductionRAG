@@ -29,15 +29,19 @@ def main():
     # Step 1: Basic Baseline
     print("\n📌 STEP 1: Running Basic RAG Baseline...")
     print("-" * 40)
-    from naive_baseline import main as run_baseline
-    run_baseline()
+    naive_path = "reports/naive_baseline_report.json"
+    if os.path.exists(naive_path):
+        print(f"  ✓ {naive_path} already exists — using existing baseline scores.")
+    else:
+        from naive_baseline import main as run_baseline
+        run_baseline()
 
     # Step 2: Production Pipeline
     print("\n📌 STEP 2: Running Production Pipeline...")
     print("-" * 40)
     from src.pipeline import build_pipeline, evaluate_pipeline
-    search, reranker = build_pipeline()
-    prod_results = evaluate_pipeline(search, reranker)
+    search, reranker, parent_lookup = build_pipeline()
+    prod_results = evaluate_pipeline(search, reranker, parent_lookup)
 
     # Ensure reports are located in reports/
     for f in ["ragas_report.json", "naive_baseline_report.json"]:

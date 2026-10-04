@@ -22,46 +22,62 @@ class RerankResult:
     rank: int
 
 
+_CROSS_ENCODER_MODEL = None
+
+
 class CrossEncoderReranker:
     def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3"):
         self.model_name = model_name
         self._model = None
 
     def _load_model(self):
-        if self._model is None:
-            # TODO: Load cross-encoder model
-            # from sentence_transformers import CrossEncoder
-            # self._model = CrossEncoder(self.model_name)
-            #
-            # ⚠️ LƯU Ý: Dùng sentence_transformers.CrossEncoder, KHÔNG dùng FlagEmbedding.
-            # FlagReranker crash với transformers>=5.0 (XLMRobertaTokenizer lỗi).
-            pass
+        global _CROSS_ENCODER_MODEL
+        if _CROSS_ENCODER_MODEL is None or getattr(_CROSS_ENCODER_MODEL, "_model_name_cached", None) != self.model_name:
+            # Dùng sentence_transformers.CrossEncoder — KHÔNG dùng FlagEmbedding
+            # (FlagReranker crash với transformers>=5.0 trên XLMRobertaTokenizer).
+            from sentence_transformers import CrossEncoder
+            _CROSS_ENCODER_MODEL = CrossEncoder(self.model_name)
+            _CROSS_ENCODER_MODEL._model_name_cached = self.model_name
+        self._model = _CROSS_ENCODER_MODEL
         return self._model
 
     def rerank(self, query: str, documents: list[dict], top_k: int = RERANK_TOP_K) -> list[RerankResult]:
         """Rerank documents: top-20 → top-k."""
-        # TODO: Implement reranking
-        # 1. if not documents: return []
-        # 2. model = self._load_model()
-        # 3. pairs = [(query, doc["text"]) for doc in documents]
-        # 4. scores = model.predict(pairs)
-        # 5. if isinstance(scores, (int, float)): scores = [scores]
-        # 6. scored = sorted(zip(scores, documents), key=lambda x: x[0], reverse=True)
-        # 7. Return [RerankResult(text=..., original_score=doc.get("score", 0.0),
-        #            rerank_score=float(score), metadata=..., rank=i)
-        #            for i, (score, doc) in enumerate(scored[:top_k])]
-        return []
+        if not documents:
+            return []
+        model = self._load_model()
+        pairs = [(query, doc["text"]) for doc in documents]
+        scores = model.predict(pairs, max_length=256, show_progress_bar=False)
+        # predict() có thể trả về scalar khi chỉ 1 sample.
+        if isinstance(scores, (int, float)):
+            scores = [scores]
+        scored = sorted(
+            zip(scores, documents),
+            key=lambda x: float(x[0]),
+            reverse=True,
+        )
+        results: list[RerankResult] = []
+        for i, (score, doc) in enumerate(scored[:top_k]):
+            results.append(RerankResult(
+                text=doc["text"],
+                original_score=float(doc.get("score", 0.0)),
+                rerank_score=float(score),
+                metadata=doc.get("metadata", {}),
+                rank=i,
+            ))
+        return results
 
 
 class FlashrankReranker:
-    """Lightweight alternative (<5ms). Optional."""
+    """Lightweight alternative (<5ms). Optional — dùng flashrank ONNX."""
     def __init__(self):
         self._model = None
 
     def rerank(self, query: str, documents: list[dict], top_k: int = RERANK_TOP_K) -> list[RerankResult]:
-        # TODO (optional): from flashrank import Ranker, RerankRequest
+        # Optional implementation: from flashrank import Ranker, RerankRequest
         # model = Ranker(); passages = [{"text": d["text"]} for d in documents]
         # results = model.rerank(RerankRequest(query=query, passages=passages))
+        # Lab không yêu cầu Flashrank; CrossEncoder đã đủ dùng.
         return []
 
 

@@ -6,3 +6,6 @@ __pycache__/
 qdrant_data/
 *.egg-info/
 CODELAB.md
+.venv/
+reports/_cache/
+eval_cache.py

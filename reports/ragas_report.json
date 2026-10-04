@@ -1,0 +1,171 @@
+{
+  "aggregate": {
+    "faithfulness": 0.2875,
+    "answer_relevancy": 0.2780250718699583,
+    "context_precision": 0.3833333333099999,
+    "context_recall": 0.4333333333333333
+  },
+  "num_questions": 20,
+  "failures": [
+    {
+      "question": "Phụ cấp ăn trưa hàng tháng là bao nhiêu?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "Phụ cấp ăn trưa là 1.000.000 VNĐ/tháng, chi trả cùng kỳ lương.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.0,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Nhân viên tạm ứng 15 triệu, sau 20 ngày mới thanh toán. Bị phạt bao nhiêu?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "Thời hạn thanh toán là 15 ngày. Quá hạn 5 ngày, bị tính phí 2%/tháng trên 15.000.000 VNĐ = 300.000 VNĐ/tháng (tính pro-rata khoảng 50.000 VNĐ cho 5 ngày).",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.0,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Bảo hiểm sức khỏe PVI có hạn mức bao nhiêu cho nhân viên?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "Hạn mức bảo hiểm sức khỏe PVI cho nhân viên là 200.000.000 VNĐ/năm, bao gồm nội trú, ngoại trú và nha khoa.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.083333333325,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.3333333333,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Nghỉ phép không lương 20 ngày cần ai phê duyệt?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "Nghỉ 16-30 ngày cần phê duyệt của Giám đốc điều hành (CEO). Lưu ý: nghỉ trên 14 ngày không lương, nhân viên phải tự đóng phần bảo hiểm của mình.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.083333333325,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.3333333333,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Nhân viên được tài trợ khóa học 25 triệu, nghỉ việc sau 8 tháng hoàn thành khóa học. Phải hoàn trả bao nhiêu?",
+      "answer": "Nhân viên đã được tài trợ khóa học 25 triệu, nhưng theo chính sách, công ty chỉ chi trả tối đa 30.000.000 VNĐ cho khóa học. Nhân viên này nghỉ việc sau 8 tháng, trong khi thâm niên yêu cầu để được tài trợ là từ 1 năm trở lên. Do đó, nhân viên này không đủ điều kiện để giữ khoản tài trợ và phải hoàn trả toàn bộ số tiền đã nhận.\n\nVậy, nhân viên phải hoàn trả **25 triệu VNĐ**.",
+      "ground_truth": "Nhân viên phải cam kết làm việc ít nhất 1 năm sau khi hoàn thành khóa học. Nghỉ sau 8 tháng là trước hạn cam kết, phải hoàn trả 100% chi phí tức 25.000.000 VNĐ.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.11740321941691167,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.4696128776676467,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Có cần kích hoạt xác thực đa yếu tố (MFA) không?",
+      "answer": "Có, cần kích hoạt xác thực đa yếu tố (MFA). Phương thức MFA được chấp nhận bao gồm \"ứng dụng Authenticator (ưu tiên), SMS OTP, hoặc YubiKey.\"",
+      "ground_truth": "Có, theo chính sách mật khẩu v2.0 hiện hành, tất cả nhân viên bắt buộc kích hoạt MFA cho email, VPN và hệ thống nội bộ. Chính sách cũ v1.0 không yêu cầu MFA.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.1249999999875,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.49999999995,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Mật khẩu phải có tối thiểu bao nhiêu ký tự?",
+      "answer": "Mật khẩu phải có tối thiểu **8 ký tự**.",
+      "ground_truth": "Theo chính sách hiện hành (v2.0), mật khẩu phải có tối thiểu 12 ký tự. Chính sách cũ (v1.0) yêu cầu 8 ký tự nhưng đã bị thay thế.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.125,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.5
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Nhân viên thử việc có được nghỉ phép năm không?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "KHÔNG. Nhân viên thử việc KHÔNG được nghỉ phép năm. Nếu cần nghỉ, phải xin nghỉ không lương và được trưởng phòng phê duyệt.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.14583333332604165,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.5833333333041666,
+        "context_recall": 0.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Bao lâu phải đổi mật khẩu một lần?",
+      "answer": "Mật khẩu phải được thay đổi **mỗi 90 ngày**.",
+      "ground_truth": "Theo chính sách hiện hành (v2.0), mật khẩu phải được thay đổi mỗi 120 ngày. Chính sách cũ yêu cầu 90 ngày nhưng đã bị thay thế.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.20833333332499998,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.3333333333,
+        "context_recall": 0.5
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    },
+    {
+      "question": "Mentor và buddy của nhân viên mới có thể là cùng một người không? Quản lý trực tiếp có thể làm mentor không?",
+      "answer": "Không tìm thấy.",
+      "ground_truth": "KHÔNG cho cả hai. Mentor và buddy phải là hai người khác nhau. Quản lý trực tiếp không được làm mentor hoặc buddy.",
+      "worst_metric": "faithfulness",
+      "worst_score": 0.0,
+      "avg_score": 0.25,
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 1.0
+      },
+      "diagnosis": "LLM tự bịa câu trả lời ngoài tài liệu (hallucination).",
+      "suggested_fix": "Thắt chặt system prompt, giảm temperature về 0, ép LLM trích dẫn context trước khi trả lời."
+    }
+  ]
+}
